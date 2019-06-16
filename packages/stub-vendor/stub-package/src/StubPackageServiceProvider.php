@@ -12,91 +12,25 @@ class StubPackageServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Config
-        |--------------------------------------------------------------------------
-        */
+        $this->publishesConfig();
+
+        $this->registerRoutes();
+        $this->registerViews();
+        $this->registerMigrations();
+        $this->registerTranslations();
+        $this->registerDirectives();
+
+    }
+
+
+    /**
+     * Publishes config
+     */
+    public function publishesConfig()
+    {
         $this->publishes([
-            __DIR__ . '/../config/stub-package.php' => config_path('stub-package.php'),
+            __DIR__.'/../config/stub-package.php' => config_path('stub-package.php'),
         ], 'config');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Directives
-        |--------------------------------------------------------------------------
-        */
-//        Blade::directive('datetime', function ($expression) {
-        /*            return "<?php echo ($expression)->format('m/d/Y H:i'); ?>";*/
-//        });
-//
-//        Blade::if('env', function ($environment) {
-//            return app()->environment($environment);
-//        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Migrations
-        |--------------------------------------------------------------------------
-        */
-//        $this->loadMigrationsFrom(__DIR__ . '/path/to/migrations');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Translations
-        |--------------------------------------------------------------------------
-        */
-
-//        $this->loadTranslationsFrom(__DIR__ . '/path/to/translations', 'stub-package');
-//        $this->publishes([
-//            __DIR__ . '/path/to/translations' => resource_path('lang/vendor/stub-package'),
-//        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Routes
-        |--------------------------------------------------------------------------
-        */
-//        $this->loadRoutesFrom(__DIR__ . '/routes.php');
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Views
-        |--------------------------------------------------------------------------
-        */
-//        $this->loadViewsFrom(__DIR__ . '/path/to/views', 'stub-package');
-//        $this->publishes([
-//            __DIR__ . '/path/to/views' => resource_path('views/vendor/stub-package'),
-//        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Commands
-        |--------------------------------------------------------------------------
-        */
-//        if ($this->app->runningInConsole()) {
-//            $this->commands([
-//                FooCommand::class,
-//                BarCommand::class,
-//            ]);
-//        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Public Assets
-        |--------------------------------------------------------------------------
-        | php artisan vendor:publish --tag=public --force
-        */
-//        $this->publishes([
-//            __DIR__.'/path/to/assets' => public_path('vendor/stub-package'),
-//        ], 'public');
     }
 
     /**
@@ -104,6 +38,78 @@ class StubPackageServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'stub-package');
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'stub-package');
     }
+
+
+    /**
+     * Register Routes
+     */
+    public function registerRoutes()
+    {
+        $this->loadRoutesFrom(__DIR__.'/routes.php');
+    }
+
+    /**
+     * Register Views
+     */
+    public function registerViews()
+    {
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'stub-package');
+
+        $this->publishes([
+            __DIR__.'/../resources/views' => resource_path('views/vendor/stub-package'),
+        ]);
+    }
+
+
+    /**
+     * Register Migrations
+     */
+    public function registerMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+    }
+
+
+    /**
+     * Register commands.
+     */
+    public function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                FooCommand::class,
+                BarCommand::class,
+            ]);
+        }
+    }
+
+
+    /**
+     * Register Translations
+     */
+    public function registerTranslations()
+    {
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'stub-package');
+        $this->publishes([
+            __DIR__.'/../resources/lang' => resource_path('lang/vendor/stub-package'),
+        ]);
+    }
+
+
+    /**
+     * Register Directives
+     */
+    public function registerDirectives()
+    {
+        Blade::directive('datetime', function ($expression) {
+            return "<?php echo ($expression)->format('m/d/Y H:i'); ?>";
+        });
+
+        Blade::if('env', function ($environment) {
+            return app()->environment($environment);
+        });
+    }
+
 }
