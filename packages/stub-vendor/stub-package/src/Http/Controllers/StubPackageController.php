@@ -2,19 +2,24 @@
 
 namespace StubVendor\StubPackage\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use StubVendor\StubPackage\Http\Requests\CreateStubPackageRequest;
+use StubVendor\StubPackage\Http\Requests\UpdateStubPackageRequest;
+use StubVendor\StubPackage\Http\Resources\StubPackageResource;
+use StubVendor\StubPackage\Models\StubPackage;
+use StubVendor\StubPackage\Repositories\StubPackageRepository;
 
 class StubPackageController extends Controller
 {
+    /**
+     * @var \StubVendor\StubPackage\Repositories\StubPackageRepository
+     */
     protected $stub_package;
 
-    /**
-     * StubPackageController constructor.
-     */
-    public function __construct()
+    public function __construct(StubPackageRepository $stub_package)
     {
+        $this->stub_package = $stub_package;
     }
 
     /**
@@ -24,7 +29,29 @@ class StubPackageController extends Controller
      */
     public function index()
     {
-        return view('stub-package::index');
+        $this->authorize('list', StubPackage::class);
+
+        $stub_packages = $this->stub_package->query()->get();
+
+        return view('stub-package::index', [
+            'stub_packages' => $stub_packages,
+        ]);
+    }
+
+    /**
+     * Show the specified resource.
+     *
+     * @param  \StubVendor\StubPackage\Models\StubPackage  $stub_package
+     *
+     * @return Response
+     */
+    public function show(StubPackage $stub_package)
+    {
+        $this->authorize('view', $stub_package);
+
+        return view('stub-package::show', [
+            'stub_package' => $stub_package,
+        ]);
     }
 
     /**
@@ -40,61 +67,59 @@ class StubPackageController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  \StubVendor\StubPackage\Http\Requests\CreateStubPackageRequest  $request
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function store(CreateStubPackageRequest $request)
     {
-        //
-    }
+        $stub_package = $this->stub_package->create($request->all());
 
-    /**
-     * Show the specified resource.
-     *
-     * @param  int  $id
-     *
-     * @return Response
-     */
-    public function show($id)
-    {
-        return view('stub-package::show');
+        return StubPackageResource::make($stub_package);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \StubVendor\StubPackage\Models\StubPackage  $stub_package
      *
      * @return Response
      */
-    public function edit($id)
+    public function edit(StubPackage $stub_package)
     {
+        $this->authorize('update', $stub_package);
+
         return view('stub-package::edit');
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
-     * @param  int  $id
+     * @param  \StubVendor\StubPackage\Http\Requests\UpdateStubPackageRequest  $request
+     * @param  \StubVendor\StubPackage\Models\StubPackage  $stub_package
      *
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateStubPackageRequest $request, StubPackage $stub_package)
     {
-        //
+        $stub_package = $this->stub_package->update($request->all(), $stub_package);
+
+        return StubPackageResource::make($stub_package);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \StubVendor\StubPackage\Models\StubPackage  $stub_package
      *
      * @return Response
      */
-    public function destroy($id)
+    public function destroy(StubPackage $stub_package)
     {
-        //
+        $this->authorize('delete', $stub_package);
+
+        return response()->json();
     }
+
+
 }

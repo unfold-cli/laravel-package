@@ -14,11 +14,11 @@ class StubPackageServiceProvider extends ServiceProvider
     {
         $this->publishesConfig();
 
-        $this->registerRoutes();
-        $this->registerViews();
-        $this->registerMigrations();
-        $this->registerTranslations();
-        $this->registerDirectives();
+//        $this->registerRoutes();
+//        $this->registerViews();
+//        $this->registerMigrations();
+//        $this->registerTranslations();
+//        $this->registerDirectives();
 
     }
 

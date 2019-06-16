@@ -36,5 +36,4 @@ class StubPackage extends Model
         $this->attributes['first_name'] = strtolower($value);
     }
     //endregion
-
 }

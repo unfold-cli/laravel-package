@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use StubVendor\StubPackage\Http\Controllers\Api\StubPackageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/cart', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => 'auth:api', 'as' => 'api.', 'prefix' => 'api'], function ($router) {
+    Route::post('/stub-packages/action', StubPackageController::class."@action");
+    Route::apiResource('stub-packages', StubPackageController::class);
 });

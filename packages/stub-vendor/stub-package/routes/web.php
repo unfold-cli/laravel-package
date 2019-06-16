@@ -11,6 +11,8 @@
 |
 */
 
-Route::prefix('cart')->group(function() {
-    Route::get('/', 'CartController@index');
+use StubVendor\StubPackage\Http\Controllers\StubPackageController;
+
+Route::group(['middleware' => 'auth'], function ($router) {
+    Route::resource('stub-packages', StubPackageController::class);
 });
