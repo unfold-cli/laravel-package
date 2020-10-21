@@ -13,13 +13,11 @@ class StubPackageServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishesConfig();
-
-//        $this->registerRoutes();
-//        $this->registerViews();
+        $this->registerRoutes();
+        $this->registerViews();
 //        $this->registerMigrations();
 //        $this->registerTranslations();
 //        $this->registerDirectives();
-
     }
 
 
@@ -47,7 +45,7 @@ class StubPackageServiceProvider extends ServiceProvider
      */
     public function registerRoutes()
     {
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/routes.php');
     }
 
     /**

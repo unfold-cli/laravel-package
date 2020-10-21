@@ -5,6 +5,7 @@ namespace StubVendor\StubPackage\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use Jgile\Messenger\Contracts\Messenger;
 use StubVendor\StubPackage\Http\Requests\CreateStubPackageRequest;
 use StubVendor\StubPackage\Http\Requests\UpdateStubPackageRequest;
 use StubVendor\StubPackage\Http\Resources\StubPackageResource;
@@ -13,14 +14,16 @@ use StubVendor\StubPackage\Repositories\StubPackageRepository;
 
 class StubPackageController extends Controller
 {
-    /**
-     * @var \StubVendor\StubPackage\Repositories\StubPackageRepository
-     */
-    protected $stub_package;
+    /** @var \Jgile\Messenger\Messenger */
+    protected $messenger;
 
-    public function __construct(StubPackageRepository $stub_package)
+    /** @var \App\Repositories\CartItemRepository */
+    protected $repository;
+
+    public function __construct(Messenger $messenger, StubPackageRepository $stub_package_repo)
     {
-        $this->stub_package = $stub_package;
+        $this->messenger = $messenger;
+        $this->repository = $stub_package_repo;
     }
 
     /**
@@ -32,8 +35,7 @@ class StubPackageController extends Controller
     public function index()
     {
         $this->authorize('list', StubPackage::class);
-
-        $collection = $this->stub_package->query()->paginate();
+        $collection = $this->repository->query()->paginate();
 
         return StubPackageResource::collection($collection);
     }
@@ -47,7 +49,8 @@ class StubPackageController extends Controller
      */
     public function store(CreateStubPackageRequest $request)
     {
-        $stub_package = $this->stub_package->create($request->all());
+        $stub_package = $this->repository->create($request->all());
+        $this->messenger->success("Stub Package Created.");
 
         return StubPackageResource::make($stub_package);
     }
@@ -77,9 +80,16 @@ class StubPackageController extends Controller
      */
     public function update(UpdateStubPackageRequest $request, StubPackage $stub_package)
     {
-        $stub_package = $this->stub_package->update($request->all(), $stub_package);
+        if ($stub_package) {
+            $this->repository->update($request->all(), $stub_package);
+            $this->messenger->success("Stub Package Updated.");
 
-        return StubPackageResource::make($stub_package);
+            return new StubPackageResource($stub_package);
+        }
+
+        $this->repository->query()->update($request->post());
+
+        return $this->messenger->success("Stub Packages Updated.");
     }
 
     /**
@@ -93,8 +103,10 @@ class StubPackageController extends Controller
     public function destroy(StubPackage $stub_package)
     {
         $this->authorize('delete', $stub_package);
+        $this->repository->delete($stub_package);
+        $this->messenger->success("Stub Package Deleted.");
 
-        return response()->json();
+        return new StubPackageResource($stub_package);
     }
 
     /**
@@ -107,6 +119,6 @@ class StubPackageController extends Controller
      */
     public function action(Request $request, $action)
     {
-        return $this->stub_package->action($action, $request->post());
+        return $this->repository->action($action, $request->post());
     }
 }
